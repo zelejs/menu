@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jfeat.am.module.menu.services.domain.dao.QueryMenuDao">
+    <sql id="Base_Column_List">
+        t_sys_menu.id, t_sys_menu.menu_name AS menuName, t_sys_menu.pid AS pid, t_sys_menu.order_num AS orderNum,
+        t_sys_menu.path, t_sys_menu.component, t_sys_menu.is_frame AS isFrame, t_sys_menu.is_cache AS isCache,
+        t_sys_menu.menu_type AS menuType, t_sys_menu.visible, t_sys_menu.status, t_sys_menu.perm_id AS permId, t_sys_menu.icon,
+        t_sys_menu.create_by AS createBy, t_sys_menu.create_time AS createTime, t_sys_menu.update_by AS updateBy,
+        t_sys_menu.update_time AS updateTime, t_sys_menu.remark, t_sys_menu.org_id AS orgId, t_sys_menu.perm AS perm
+    </sql>
+
+    <sql id="QueryOwnedOrgIds">
+        SELECT children.id FROM t_sys_org, t_sys_org as children WHERE t_sys_org.left_num &lt;= children.left_num AND
+        t_sys_org.right_num >= children.left_num and t_sys_org.id=#{record.orgId} order by t_sys_org.node_level ASC
+    </sql>
+
+    <sql id="OrderBy">
+        order by t_sys_menu.order_num asc
+    </sql>
+
+    <sql id="OrderByChi">
+        order by chi.order_num asc
+    </sql>
+
+
+    <select id="queryMasterModel" resultType="MenuModel">
+        SELECT t_sys_menu.*
+        FROM t_sys_menu
+        WHERE t_sys_menu.id=#{id}
+        GROUP BY t_sys_menu.id
+    </select>
+
+
+    <select id="findMenuPage" resultType="MenuRecord" parameterType="MenuRecord">
+        SELECT
+        <include refid="Base_Column_List"/>
+
+
+        FROM t_sys_menu
+
+
+        <if test="record.orgId > 0">
+            ,(<include refid="QueryOwnedOrgIds"></include>) AS ownedOrgIds
+        </if>
+
+        WHERE 1=1
+        <if test="record.orgId > 0">
+            AND t_sys_menu.org_id = ownedOrgIds.id
+        </if>
+
+
+        <if test="record.id != null and record.id>0 ">
+            AND t_sys_menu.id LIKE CONCAT('%',#{record.id},'%')
+        </if>
+
+
+        <if test="record.menuName != null and record.menuName!= ''">
+            AND t_sys_menu.menu_name LIKE CONCAT('%',#{record.menuName},'%')
+        </if>
+
+
+        <if test="record.pid != null and record.pid>0 ">
+            AND t_sys_menu.pid LIKE CONCAT('%',#{record.pid},'%')
+        </if>
+
+
+        <if test="record.orderNum != null and record.orderNum>0 ">
+            AND t_sys_menu.order_num LIKE CONCAT('%',#{record.orderNum},'%')
+        </if>
+        <if test="record.path != null and record.path!= ''">
+            AND t_sys_menu.path LIKE CONCAT('%',#{record.path},'%')
+        </if>
+        <if test="record.component != null and record.component!= ''">
+            AND t_sys_menu.component LIKE CONCAT('%',#{record.component},'%')
+        </if>
+
+
+        <if test="record.isFrame != null and record.isFrame>0 ">
+            AND t_sys_menu.is_frame LIKE CONCAT('%',#{record.isFrame},'%')
+        </if>
+
+
+        <if test="record.isCache != null and record.isCache>0 ">
+            AND t_sys_menu.is_cache LIKE CONCAT('%',#{record.isCache},'%')
+        </if>
+
+
+        <if test="record.menuType != null and record.menuType!= ''">
+            AND t_sys_menu.menu_type LIKE CONCAT('%',#{record.menuType},'%')
+        </if>
+        <if test="record.visible != null and record.visible!= ''">
+            AND t_sys_menu.visible LIKE CONCAT('%',#{record.visible},'%')
+        </if>
+        <if test="record.status != null and record.status!= ''">
+            AND t_sys_menu.status LIKE CONCAT('%',#{record.status},'%')
+        </if>
+
+
+        <if test="record.permId != null and record.permId>0 ">
+            AND t_sys_menu.perm_id LIKE CONCAT('%',#{record.permId},'%')
+        </if>
+        <if test="record.icon != null and record.icon!= ''">
+            AND t_sys_menu.icon LIKE CONCAT('%',#{record.icon},'%')
+        </if>
+
+
+        <if test="record.createBy != null and record.createBy!= ''">
+            AND t_sys_menu.create_by LIKE CONCAT('%',#{record.createBy},'%')
+        </if>
+
+
+        <if test="record.createTime != null and record.createTime>0 ">
+            AND t_sys_menu.create_time LIKE CONCAT('%',#{record.createTime},'%')
+        </if>
+
+
+        <if test="record.updateBy != null and record.updateBy!= ''">
+            AND t_sys_menu.update_by LIKE CONCAT('%',#{record.updateBy},'%')
+        </if>
+
+
+        <if test="record.updateTime != null and record.updateTime>0 ">
+            AND t_sys_menu.update_time LIKE CONCAT('%',#{record.updateTime},'%')
+        </if>
+        <if test="record.remark != null and record.remark!= ''">
+            AND t_sys_menu.remark LIKE CONCAT('%',#{record.remark},'%')
+        </if>
+
+
+        <if test="record.orgId != null and record.orgId>0 ">
+            AND t_sys_menu.org_id IN (<include refid="QueryOwnedOrgIds"/>)
+        </if>
+
+        <if test="startTime != null">
+            <![CDATA[AND t_sys_menu.start_time >= DATE(#{startTime})]]>
+        </if>
+        <if test="endTime != null">
+            <![CDATA[AND t_sys_menu.end_time <= DATE(#{endTime}]]>
+        </if>
+        <!--
+    <if test="search != null and search != ''">
+        OR t_sys_menu.name LIKE CONCAT('%',#{search},'%')
+    </if>
+    -->
+        <include refid="OrderBy"/>
+    </select>
+
+    <select id="getPMenu" resultType="com.jfeat.am.module.menu.services.gen.crud.model.MenuModel">
+        SELECT
+        	*
+        FROM
+        	t_sys_menu
+        WHERE
+        	t_sys_menu.pid IS NULL
+        	and t_sys_menu.menu_type='C'
+        <if test="orgId != null">
+            and org_id = #{orgId}
+        </if>
+        <if test="status != null ">
+            and `status` = #{status}
+        </if>
+        <include refid="OrderBy"/>
+    </select>
+
+
+    <select id="getSonMenu" resultType="com.jfeat.am.module.menu.services.gen.crud.model.MenuModel">
+        SELECT
+        *
+        FROM
+        t_sys_menu
+        WHERE
+         t_sys_menu.pid in
+        <foreach collection="ids" open="(" separator="," close=")" item="index">
+            #{index}
+        </foreach>
+        <if test="status != null ">
+        and `status` = #{status}
+        </if>
+        <include refid="OrderBy"/>
+    </select>
+
+    <select id="selectOne"  resultType="MenuRecord">
+    select  chi.id, chi.menu_name AS menuName, chi.pid AS pid, chi.order_num AS orderNum,
+        chi.path, chi.component, chi.is_frame AS isFrame, chi.is_cache AS isCache,
+        chi.menu_type AS menuType, chi.visible, chi.`status`, chi.perm_id AS permId, chi.icon,
+        chi.create_by AS createBy, chi.create_time AS createTime, chi.update_by AS updateBy,
+        chi.update_time AS updateTime, chi.remark, chi.org_id AS orgId
+				,fa.menu_name as 'pName',t_sys_perm.name as perm
+      from t_sys_menu chi left join t_sys_menu  fa on fa.id = chi.pid
+      left join t_sys_perm on t_sys_perm.id = chi.perm_id
+      where chi.id = #{id}
+        <include refid="OrderByChi"/>
+    </select>
+
+
+    <select id="getPerm" resultType="String">
+        select identifier from t_sys_perm where id = #{id};
+    </select>
+
+    <update id="alterStatus">
+        update t_sys_menu set `status` = IF(`status` = 1,0,1)
+        where id = #{id};
+    </update>
+
+    <select id="searchMenu"  resultType="MenuRecord">
+        select  chi.id, chi.menu_name AS menuName, chi.pid AS pid, chi.order_num AS orderNum,
+        chi.path, chi.component, chi.is_frame AS isFrame, chi.is_cache AS isCache,
+        chi.menu_type AS menuType, chi.visible, chi.`status`, chi.perm_id AS permId, chi.icon,
+        chi.create_by AS createBy, chi.create_time AS createTime, chi.update_by AS updateBy,
+        chi.update_time AS updateTime, chi.remark, chi.org_id AS orgId
+        ,fa.menu_name as 'pName',t_sys_perm.name as perm
+        from t_sys_menu chi left join t_sys_menu  fa on fa.id = chi.pid
+        left join t_sys_perm on t_sys_perm.id = chi.perm_id
+        where chi.menu_name like #{search}
+        <include refid="OrderByChi"/>
+    </select>
+
+    <select id="getComponentById" resultType="String">
+        SELECT `component`
+        FROM `t_sys_menu`
+        WHERE `id` = #{id}
+    </select>
+
+</mapper>

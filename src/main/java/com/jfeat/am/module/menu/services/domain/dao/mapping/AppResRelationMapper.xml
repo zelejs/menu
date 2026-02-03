@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jfeat.am.module.menu.services.domain.dao.AppResRelationMapper">
+
+    <sql id="Base_Column_List">
+    
+    </sql>
+
+    <select id="getMenuIds" resultType="Long">
+        SELECT menu_id AS menuId
+        FROM t_app_res_relation
+        WHERE appid = #{appid}
+    </select>
+
+</mapper>

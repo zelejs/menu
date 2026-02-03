@@ -1,0 +1,22 @@
+SET FOREIGN_KEY_CHECKS=0;
+
+--
+--DELETE FROM `t_sys_perm_group` WHERE id='1461196615833403394';
+--INSERT INTO `t_sys_perm_group` (`id`, `org_id`, `pid`, `identifier`, `name`) VALUES
+--('1461196615833403394', '100000000000000001', '100000000000000102', 'Menu.management', '菜单管理');
+--
+--DELETE FROM `t_sys_perm` WHERE id='1461196693964865538';
+--INSERT INTO `t_sys_perm` (`id`, `group_id`, `identifier`, `name`, `tag`) VALUES
+--('1461196693964865538', '1461196615833403394', 'menu.new', '新增菜单', '0');
+--
+--DELETE FROM `t_sys_perm` WHERE id='1461196727812882434';
+--INSERT INTO `t_sys_perm` (`id`, `group_id`, `identifier`, `name`, `tag`) VALUES
+--('1461196727812882434', '1461196615833403394', 'menu.view', '查看菜单', '0');
+--
+--DELETE FROM `t_sys_perm` WHERE id='1461196751171006465';
+--INSERT INTO `t_sys_perm` (`id`, `group_id`, `identifier`, `name`, `tag`) VALUES
+--('1461196751171006465', '1461196615833403394', 'menu.edit', '编辑菜单', '0');
+--
+--DELETE FROM `t_sys_perm` WHERE id='1461196777557381121';
+--INSERT INTO `t_sys_perm` (`id`, `group_id`, `identifier`, `name`, `tag`) VALUES
+--('1461196777557381121', '1461196615833403394', 'menu.delete', '删除菜单', '0');
