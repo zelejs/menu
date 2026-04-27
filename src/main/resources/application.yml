@@ -39,12 +39,14 @@ mybatis-plus:
 ---
 
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
   datasource:
     url: jdbc:mysql://sh-cynosdbmysql-grp-mlyunquo.sql.tencentcdb.com:25133/smallsaas_dev?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC
     username: root
     password: zb2014@8888
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     filters: log4j,wall,mergeStat
     sql-script-encoding: UTF-8
     schema: classpath*:sql/**/*-schema.sql
@@ -52,6 +54,8 @@ spring:
     initialize: false
 
 logging:
-  level: debug
-  file: logs/trace.log
+  level:
+    root: debug
+  file:
+    name: logs/trace.log
 ---

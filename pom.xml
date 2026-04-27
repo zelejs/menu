@@ -16,39 +16,65 @@
     </parent>
 
     <properties>
-        <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
         <skipStandalone>true</skipStandalone>
-        <crud-plus.version>21.0.0</crud-plus.version>
+        <!--
+            以下版本已由 plat-parent 管理：
+            - java.version = 17
+            - lombok.version = 1.18.36
+            - Spring Boot 版本 = 3.4.0 (通过 plat-parent 的 parent)
+        -->
+
+        <!-- 本项目特有的依赖版本管理 -->
+        <swagger.version>1.6.11</swagger.version>
         <jwt-core.version>21.0.0</jwt-core.version>
+        <plat-common.version>1.0.0</plat-common.version>
+        <guava.version>33.3.1-jre</guava.version>
     </properties>
 
     <dependencies>
-        <!--<dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
-        </dependency>-->
         <dependency>
-            <groupId>com.jfeat</groupId>
-            <artifactId>crud-plus</artifactId>
-            <version>${crud-plus.version}</version>
+            <groupId>com.xinzhi.plat</groupId>
+            <artifactId>plat-common</artifactId>
+            <version>${plat-common.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jfeat</groupId>
             <artifactId>jwt-core</artifactId>
             <version>${jwt-core.version}</version>
         </dependency>
+
+        <!-- Spring Boot Web -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.83</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- Swagger -->
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>1.6.11</version>
+            <version>${swagger.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- FastJSON -->
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>2.0.43</version>
+        </dependency>
+
+        <!-- MySQL Driver -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 
@@ -59,9 +85,16 @@
                 <artifactId>swagger-maven-plugin</artifactId>
                 <version>3.1.5</version>
                 <dependencies>
+                    <!-- JAXB API for Java 9+ -->
                     <dependency>
                         <groupId>javax.xml.bind</groupId>
                         <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                    <!-- JAXB implementation -->
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
                         <version>2.3.1</version>
                     </dependency>
                 </dependencies>
@@ -95,25 +128,26 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.3.0</version>
             </plugin>
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>com.jfeat.AmApplication</mainClass>
                     <skip>${skipStandalone}</skip>
                 </configuration>
                 <executions>

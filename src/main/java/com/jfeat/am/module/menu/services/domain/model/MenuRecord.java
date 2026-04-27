@@ -7,6 +7,8 @@ import com.jfeat.am.module.menu.services.gen.persistence.model.Menu;
  */
 public class MenuRecord extends Menu{
     private String pName;
+    private String appId;
+    private Integer invisible;
 
     public String getpName() {
         return pName;
@@ -14,5 +16,21 @@ public class MenuRecord extends Menu{
 
     public void setpName(String pName) {
         this.pName = pName;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public Integer getInvisible() {
+        return invisible;
+    }
+
+    public void setInvisible(Integer invisible) {
+        this.invisible = invisible;
     }
 }

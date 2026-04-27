@@ -3,15 +3,12 @@ package com.jfeat.am.module.menu.services.gen.crud.service.impl;
 
             
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jfeat.crud.plus.FIELD;
 import com.jfeat.am.module.menu.services.gen.persistence.model.Menu;
 import com.jfeat.am.module.menu.services.gen.persistence.dao.MenuMapper;
 import com.jfeat.am.module.menu.services.gen.crud.service.CRUDMenuService;
 import org.springframework.stereotype.Service;
-import com.jfeat.crud.base.exception.BusinessCode;
-import com.jfeat.crud.base.exception.BusinessException;
+import com.xinzhi.plat.common.exception.BusinessException;
 import jakarta.annotation.Resource;
-import com.jfeat.crud.plus.impl.CRUDServiceOnlyImpl;
 
 /**
  * <p>
@@ -23,7 +20,7 @@ import com.jfeat.crud.plus.impl.CRUDServiceOnlyImpl;
  */
 
 @Service
-public class CRUDMenuServiceImpl  extends CRUDServiceOnlyImpl<Menu> implements CRUDMenuService {
+public class CRUDMenuServiceImpl  implements CRUDMenuService {
 
 
 
@@ -32,7 +29,6 @@ public class CRUDMenuServiceImpl  extends CRUDServiceOnlyImpl<Menu> implements C
         @Resource
         protected MenuMapper menuMapper;
 
-        @Override
         protected BaseMapper<Menu> getMasterMapper() {
                 return menuMapper;
         }

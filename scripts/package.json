@@ -1,0 +1,25 @@
+{
+  "name": "menu-cli",
+  "version": "1.0.0",
+  "description": "菜单管理 CLI 工具 - 用于访问和管理菜单 API",
+  "main": "menu_cli.js",
+  "bin": {
+    "menu-cli": "./menu_cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "menu",
+    "cli",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

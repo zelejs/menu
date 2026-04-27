@@ -3,13 +3,100 @@
 <mapper namespace="com.jfeat.am.module.menu.services.domain.dao.AppResRelationMapper">
 
     <sql id="Base_Column_List">
-    
+
     </sql>
 
     <select id="getMenuIds" resultType="Long">
-        SELECT menu_id AS menuId
+        SELECT res_id AS menuId
         FROM t_app_res_relation
-        WHERE appid = #{appid}
+        WHERE app_id = #{appid}
+        AND res_type = 'menu'
     </select>
+
+    <!-- 删除单个关联 -->
+    <delete id="deleteByAppIdAndResId">
+        DELETE FROM t_app_res_relation
+        WHERE app_id = #{appid} AND res_id = #{resId} AND res_type = 'menu'
+    </delete>
+
+    <!-- 批量删除关联 -->
+    <delete id="deleteByAppIdAndResIds">
+        DELETE FROM t_app_res_relation
+        WHERE app_id = #{appid}
+        AND res_id IN <foreach collection="resIds" item="resId" open="(" separator="," close=")">#{resId}</foreach>
+        AND res_type = 'menu'
+    </delete>
+
+    <!-- 统计指定应用和资源的关联数量 -->
+    <select id="countByAppIdAndResId" resultType="Integer">
+        SELECT COUNT(*) FROM t_app_res_relation
+        WHERE app_id = #{appid} AND res_id = #{resId} AND res_type = 'menu'
+    </select>
+
+    <!-- 更新应用级菜单父ID -->
+    <update id="updatePid">
+        UPDATE t_app_res_relation
+        SET pid = #{pid},
+            update_time = NOW()
+        WHERE app_id = #{appid}
+        AND res_id = #{resId}
+        AND res_type = 'menu'
+    </update>
+
+    <!-- 获取应用级菜单父ID -->
+    <select id="getPid" resultType="Long">
+        SELECT pid
+        FROM t_app_res_relation
+        WHERE app_id = #{appid}
+        AND res_id = #{resId}
+        AND res_type = 'menu'
+        LIMIT 1
+    </select>
+
+    <!-- 批量更新应用级菜单父ID -->
+    <update id="batchUpdatePid">
+        UPDATE t_app_res_relation
+        SET pid = #{pid},
+            update_time = NOW()
+        WHERE app_id = #{appid}
+        AND res_id IN <foreach collection="resIds" item="resId" open="(" separator="," close=")">#{resId}</foreach>
+        AND res_type = 'menu'
+    </update>
+
+    <!-- 插入应用资源关联记录 -->
+    <insert id="insertAppResRelation">
+        INSERT INTO t_app_res_relation (app_id, res_type, res_id, pid, created_at, updated_at)
+        VALUES (#{appId}, #{resType}, #{resId}, #{pid}, NOW(), NOW())
+    </insert>
+
+    <!-- 更新菜单的不可见状态 -->
+    <update id="updateInvisible">
+        UPDATE t_app_res_relation
+        SET invisible = #{invisible},
+            updated_at = NOW()
+        WHERE app_id = #{appid}
+        AND res_id = #{resId}
+        AND res_type = 'menu'
+    </update>
+
+    <!-- 获取应用菜单的当前排序号 -->
+    <select id="getOrderNum" resultType="Integer">
+        SELECT order_num
+        FROM t_app_res_relation
+        WHERE app_id = #{appid}
+        AND res_id = #{resId}
+        AND res_type = 'menu'
+        LIMIT 1
+    </select>
+
+    <!-- 更新应用菜单的排序号 -->
+    <update id="updateOrderNum">
+        UPDATE t_app_res_relation
+        SET order_num = #{orderNum},
+            updated_at = NOW()
+        WHERE app_id = #{appid}
+        AND res_id = #{resId}
+        AND res_type = 'menu'
+    </update>
 
 </mapper>

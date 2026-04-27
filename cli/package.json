@@ -1,0 +1,20 @@
+{
+  "name": "menu-cli",
+  "version": "21.0.0",
+  "description": "Menu Management CLI Tool - HTTP API client for menu service",
+  "main": "index.js",
+  "bin": {
+    "menu-cli": "./bin/menu-cli.js"
+  },
+  "scripts": {
+    "test": "node test/test-cli.js"
+  },
+  "keywords": ["menu", "cli", "api", "management"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1"
+  }
+}

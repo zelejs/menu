@@ -1,0 +1,215 @@
+### ============================================================================
+### Menu Move Up/Down API Tests
+### Base URL: http://129.204.59.156:30081
+### API Prefix: /api/adm/menu/app
+### ============================================================================
+@baseUrl = http://129.204.59.156:30081
+@apiPrefix = /api/adm/menu/app
+@menuId = 176
+
+### ============================================================================
+### Setup: Get menu group and current orderNum
+### ============================================================================
+
+###
+### Get menu group (tree structure)
+GET {{baseUrl}}{{apiPrefix}}/group
+
+###
+### Get all menus (including invisible)
+GET {{baseUrl}}{{apiPrefix}}/menus
+
+###
+### Get specific menu details to check current orderNum
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+### ============================================================================
+### Test 1: Move Up (orderNum + 1)
+### ============================================================================
+
+###
+### TC-01-01: Move menu up (orderNum + 1)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+
+###
+### TC-01-02: Verify orderNum increased
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-01-03: Move up again (orderNum + 1)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+
+###
+### TC-01-04: Verify orderNum increased again
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+### ============================================================================
+### Test 2: Move Down (orderNum - 1, minimum 0)
+### ============================================================================
+
+###
+### TC-02-01: Move menu down (orderNum - 1)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-02-02: Verify orderNum decreased
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-02-03: Move down multiple times
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-02-04: Move down again
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-02-05: Verify orderNum is at minimum (0)
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-02-06: Try to move down when already at 0 (should stay at 0)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-02-07: Verify orderNum is still 0
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+### ============================================================================
+### Test 3: Verify Sorting in Menu Group
+### ============================================================================
+
+###
+### TC-03-01: Set a high orderNum to a menu
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+# Repeat this 10 times to get orderNum=10
+
+###
+### TC-03-02: Get menu group and check if orderNum affects display
+GET {{baseUrl}}{{apiPrefix}}/group
+
+###
+### TC-03-03: Get all menus sorted by orderNum
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=10&orderBy=order_num&sort=ASC
+
+### ============================================================================
+### Test 4: Edge Cases
+### ============================================================================
+
+###
+### TC-04-01: Try move up on non-existent menu ID (should return error)
+POST {{baseUrl}}{{apiPrefix}}/menus/999999/op/moveup
+
+###
+### TC-04-02: Try move down on non-existent menu ID (should return error)
+POST {{baseUrl}}{{apiPrefix}}/menus/999999/op/movedown
+
+### ============================================================================
+### Test 5: Rapid Successive Operations
+### ============================================================================
+
+###
+### TC-05-01: Move up 3 times in quick succession
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+
+###
+### TC-05-02: Move up again
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+
+###
+### TC-05-03: Move up again
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+
+###
+### TC-05-04: Verify final orderNum
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-05-05: Move down 5 times in quick succession
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-05-06: Move down again
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-05-07: Move down again
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-05-08: Move down again
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-05-09: Move down again
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-05-10: Verify final orderNum (should be 0 or close to 0)
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+### ============================================================================
+### Cleanup: Reset orderNum to 0
+### ============================================================================
+
+###
+### Reset by moving down multiple times until 0
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### Verify reset to 0
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+### ============================================================================
+### Test 6: Null orderNum Handling
+### ============================================================================
+
+###
+### TC-06-01: Set orderNum to null via direct SQL (simulate null scenario)
+### Note: This requires direct database access or a special endpoint
+
+###
+### TC-06-02: Move up when orderNum is null (should set to 1)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+
+###
+### TC-06-03: Verify orderNum is now 1
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-06-04: Move down when orderNum is 1 (should set to 0)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-06-05: Verify orderNum is now 0
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-06-06: Move down when orderNum is 0 (should stay at 0)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/movedown
+
+###
+### TC-06-07: Verify orderNum is still 0
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-06-08: Move up when orderNum is 0 (should set to 1)
+POST {{baseUrl}}{{apiPrefix}}/menus/{{menuId}}/op/moveup
+
+###
+### TC-06-09: Verify orderNum is now 1
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+### ============================================================================
+### Summary Table: orderNum Behavior
+### ============================================================================
+
+# | Current Value | Operation | Result |
+# |---------------|-----------|--------|
+# | null          | moveup    | 1      |
+# | null          | movedown  | 0      |
+# | 0             | moveup    | 1      |
+# | 0             | movedown  | 0      |
+# | 5             | moveup    | 6      |
+# | 5             | movedown  | 4      |
+# | 1             | movedown  | 0      |

@@ -13,11 +13,24 @@ public class MenuModel extends Menu{
 
     private List<MenuModel> children;
 
+    /**
+     * 是否隐藏菜单（0=可见，1=不可见）- 来自 t_app_res_relation 表
+     */
+    private Integer invisible;
+
     public List<MenuModel> getChildren() {
         return children;
     }
 
     public void setChildren(List<MenuModel> children) {
         this.children = children;
+    }
+
+    public Integer getInvisible() {
+        return invisible;
+    }
+
+    public void setInvisible(Integer invisible) {
+        this.invisible = invisible;
     }
 }

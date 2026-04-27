@@ -1,0 +1,14 @@
+{
+  "name": "menu-service",
+  "version": "21.0.0",
+  "description": "Menu Management Service CLI",
+  "bin": {
+    "menu-cli": "./cli/bin/menu-cli.js"
+  },
+  "scripts": {
+    "postinstall": "cd cli && npm install",
+    "menu-cli": "node cli/bin/menu-cli.js",
+    "test-cli": "cd cli && npm test"
+  },
+  "dependencies": {}
+}

@@ -3,7 +3,6 @@ package com.jfeat.am.module.menu.api;
 
 import com.jfeat.am.module.menu.services.gen.persistence.dao.MenuMapper;
 import com.jfeat.am.module.menu.util.MenuUtil;
-import com.jfeat.crud.plus.META;
 import com.jfeat.am.core.jwt.JWTKit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -23,11 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.dao.DuplicateKeyException;
 import com.jfeat.am.module.menu.services.domain.dao.QueryMenuDao;
-import com.jfeat.crud.base.tips.SuccessTip;
-import com.jfeat.crud.base.tips.Tip;
-import com.jfeat.crud.base.annotation.BusinessLog;
-import com.jfeat.crud.base.exception.BusinessCode;
-import com.jfeat.crud.base.exception.BusinessException;
+import com.xinzhi.plat.common.result.ApiResult;
+import com.xinzhi.plat.common.result.ApiResultEnum;
+import com.xinzhi.plat.common.exception.BusinessException;
 import com.jfeat.am.module.menu.api.permission.*;
 import com.jfeat.am.common.annotation.Permission;
 
@@ -35,6 +32,7 @@ import com.jfeat.am.common.annotation.Permission;
 import com.jfeat.am.module.menu.services.domain.service.*;
 import com.jfeat.am.module.menu.services.domain.model.MenuRecord;
 import com.jfeat.am.module.menu.services.gen.persistence.model.Menu;
+import com.jfeat.am.module.menu.services.domain.dao.AppResRelationMapper;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,52 +63,82 @@ public class MenuEndpoint {
     QueryMenuDao queryMenuDao;
     @Resource
     MenuMapper menuMapper;
+    @Resource
+    AppResRelationMapper appResRelationMapper;
 
-    @BusinessLog(name = "菜单", value = "新建菜单")
+    // @BusinessLog(name = "菜单", value = "新建菜单") // TODO: replace with plat-common equivalent
     @Permission(MenuPermission.MENU_NEW)
     @PostMapping
     @ApiOperation(value = "新建 菜单", response = Menu.class)
-    public Tip createMenu(@RequestBody Menu entity) {
+    public ApiResult<Integer> createMenu(@RequestBody Menu entity) {
 
         Integer affected = 0;
         try {
             MenuUtil.initMenu(entity);
-            setPerm(entity);
             affected = menuMapper.insert(entity);
 
+            // 如果 app_id 不为 null，同时在 t_app_res_relation 表中添加记录
+            String appId = JWTKit.getAppid();
+            if (appId != null && !appId.isEmpty() && entity.getId() != null) {
+                logger.info("Creating app_res_relation record for appId={}, menuId={}, pid={}",
+                           appId, entity.getId(), entity.getPid());
+                appResRelationMapper.insertAppResRelation(appId, "menu", entity.getId(), entity.getPid());
+            }
+
         } catch (DuplicateKeyException e) {
-            throw new BusinessException(BusinessCode.DuplicateKey);
+            throw new BusinessException(400, "Duplicate Key");
         }
 
-        return SuccessTip.create(affected);
+        return ApiResult.success(affected);
     }
 
     @Permission(MenuPermission.MENU_VIEW)
     @GetMapping("/{id}")
     @ApiOperation(value = "查看 菜单", response = Menu.class)
-    public Tip getMenu(@PathVariable Long id) {
+    public ApiResult<MenuRecord> getMenu(@PathVariable Long id) {
         MenuRecord menuRecord = queryMenuDao.selectOne(id);
-        return SuccessTip.create(menuRecord);
+        return ApiResult.success(menuRecord);
     }
 
-    @BusinessLog(name = "菜单", value = "更新 菜单")
+    // @BusinessLog(name = "菜单", value = "更新 菜单") // TODO: replace with plat-common equivalent
     @Permission(MenuPermission.MENU_EDIT)
     @PutMapping("/{id}")
     @ApiOperation(value = "修改 菜单", response = Menu.class)
-    public Tip updateMenu(@PathVariable Long id, @RequestBody Menu entity) {
+    public ApiResult<Integer> updateMenu(@PathVariable Long id, @RequestBody Menu entity) {
         entity.setId(id);
-        entity.setUpdateBy(JWTKit.getAccount());
         entity.setUpdateTime(new Date());
-        setPerm(entity);
-        return SuccessTip.create(menuMapper.updateById(entity));
+        return ApiResult.success(menuMapper.updateById(entity));
     }
 
-    @BusinessLog(name = "菜单", value = "删除 菜单")
+    // @BusinessLog(name = "菜单", value = "删除 菜单") // TODO: replace with plat-common equivalent
     @Permission(MenuPermission.MENU_DELETE)
     @DeleteMapping("/{id}")
     @ApiOperation("删除 菜单")
-    public Tip deleteMenu(@PathVariable Long id) {
-        return SuccessTip.create(menuService.deleteMaster(id));
+    public ApiResult<Integer> deleteMenu(@PathVariable Long id) {
+        return ApiResult.success(menuService.deleteMenuWithAppFilter(id));
+    }
+
+    // @BusinessLog(name = "菜单", value = "移动菜单") // TODO: replace with plat-common equivalent
+    @Permission(MenuPermission.MENU_EDIT)
+    @PutMapping("/{id}/move")
+    @ApiOperation(value = "移动菜单到指定父菜单", response = Menu.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "菜单ID", required = true, dataType = "Long"),
+            @ApiImplicitParam(name = "pid", value = "父菜单ID(null表示移到顶层)", dataType = "Long")
+    })
+    public ApiResult<Integer> moveMenu(@PathVariable Long id, @RequestParam(required = false) Long pid) {
+        return ApiResult.success(menuService.moveMenu(id, pid));
+    }
+
+    // @BusinessLog(name = "菜单", value = "提升菜单为顶级") // TODO: replace with plat-common equivalent
+    @Permission(MenuPermission.MENU_EDIT)
+    @PutMapping("/{id}/promote")
+    @ApiOperation(value = "将菜单提升为顶级菜单", response = Menu.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "菜单ID", required = true, dataType = "Long")
+    })
+    public ApiResult<Integer> promoteMenuToTop(@PathVariable Long id) {
+        return ApiResult.success(menuService.promoteMenuToTop(id));
     }
 
     @Permission(MenuPermission.MENU_VIEW)
@@ -121,11 +149,13 @@ public class MenuEndpoint {
             @ApiImplicitParam(name = "pageSize", dataType = "Integer"),
             @ApiImplicitParam(name = "search", dataType = "String"),
             @ApiImplicitParam(name = "id", dataType = "Long"),
-            @ApiImplicitParam(name = "menuName", dataType = "String"),
             @ApiImplicitParam(name = "pid", dataType = "Long"),
-            @ApiImplicitParam(name = "orderNum", dataType = "Integer"),
+            @ApiImplicitParam(name = "name", dataType = "String"),
             @ApiImplicitParam(name = "path", dataType = "String"),
             @ApiImplicitParam(name = "component", dataType = "String"),
+            @ApiImplicitParam(name = "redirect", dataType = "String"),
+            @ApiImplicitParam(name = "wrappers", dataType = "String"),
+            @ApiImplicitParam(name = "orderNum", dataType = "Integer"),
             @ApiImplicitParam(name = "isFrame", dataType = "Integer"),
             @ApiImplicitParam(name = "isCache", dataType = "Integer"),
             @ApiImplicitParam(name = "menuType", dataType = "String"),
@@ -133,25 +163,23 @@ public class MenuEndpoint {
             @ApiImplicitParam(name = "status", dataType = "String"),
             @ApiImplicitParam(name = "permId", dataType = "Long"),
             @ApiImplicitParam(name = "icon", dataType = "String"),
-            @ApiImplicitParam(name = "createBy", dataType = "String"),
             @ApiImplicitParam(name = "createTime", dataType = "Date"),
-            @ApiImplicitParam(name = "updateBy", dataType = "String"),
             @ApiImplicitParam(name = "updateTime", dataType = "Date"),
-            @ApiImplicitParam(name = "remark", dataType = "String"),
-            @ApiImplicitParam(name = "orgId", dataType = "Long"),
             @ApiImplicitParam(name = "orderBy", dataType = "String"),
             @ApiImplicitParam(name = "sort", dataType = "String")
     })
-    public Tip queryMenus(Page<MenuRecord> page,
+    public ApiResult<Page<MenuRecord>> queryMenus(Page<MenuRecord> page,
                           @RequestParam(name = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                           @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                           @RequestParam(name = "search", required = false) String search,
                           @RequestParam(name = "id", required = false) Long id,
-                          @RequestParam(name = "menuName", required = false) String menuName,
                           @RequestParam(name = "pid", required = false) Long pid,
-                          @RequestParam(name = "orderNum", required = false) Integer orderNum,
+                          @RequestParam(name = "name", required = false) String name,
                           @RequestParam(name = "path", required = false) String path,
                           @RequestParam(name = "component", required = false) String component,
+                          @RequestParam(name = "redirect", required = false) String redirect,
+                          @RequestParam(name = "wrappers", required = false) String wrappers,
+                          @RequestParam(name = "orderNum", required = false) Integer orderNum,
                           @RequestParam(name = "isFrame", required = false) Integer isFrame,
                           @RequestParam(name = "isCache", required = false) Integer isCache,
                           @RequestParam(name = "menuType", required = false) String menuType,
@@ -159,14 +187,10 @@ public class MenuEndpoint {
                           @RequestParam(name = "status", required = false) String status,
                           @RequestParam(name = "permId", required = false) Long permId,
                           @RequestParam(name = "icon", required = false) String icon,
-                          @RequestParam(name = "createBy", required = false) String createBy,
                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                           @RequestParam(name = "createTime", required = false) Date createTime,
-                          @RequestParam(name = "updateBy", required = false) String updateBy,
                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                           @RequestParam(name = "updateTime", required = false) Date updateTime,
-                          @RequestParam(name = "remark", required = false) String remark,
-                          @RequestParam(name = "orgId", required = false) Long orgId,
                           @RequestParam(name = "orderBy", required = false) String orderBy,
                           @RequestParam(name = "sort", required = false) String sort) {
 
@@ -174,7 +198,7 @@ public class MenuEndpoint {
             if (sort != null && sort.length() > 0) {
                 String pattern = "(ASC|DESC|asc|desc)";
                 if (!sort.matches(pattern)) {
-                    throw new BusinessException(BusinessCode.BadRequest.getCode(), "sort must be ASC or DESC");//此处异常类型根据实际情况而定
+                    throw new BusinessException(400, "sort must be ASC or DESC");
                 }
             } else {
                 sort = "ASC";
@@ -186,11 +210,13 @@ public class MenuEndpoint {
 
         MenuRecord record = new MenuRecord();
         record.setId(id);
-        record.setMenuName(menuName);
         record.setPid(pid);
-        record.setOrderNum(orderNum);
+        record.setName(name);
         record.setPath(path);
         record.setComponent(component);
+        record.setRedirect(redirect);
+        record.setWrappers(wrappers);
+        record.setOrderNum(orderNum);
         record.setIsFrame(isFrame);
         record.setIsCache(isCache);
         record.setMenuType(menuType);
@@ -198,32 +224,16 @@ public class MenuEndpoint {
         record.setStatus(status);
         record.setPermId(permId);
         record.setIcon(icon);
-        record.setCreateBy(createBy);
         record.setCreateTime(createTime);
-        record.setUpdateBy(updateBy);
         record.setUpdateTime(updateTime);
-        record.setRemark(remark);
-        if (META.enabledSaas()) {
-            record.setOrgId(JWTKit.getOrgId());
-        }
 
-
-        List<MenuRecord> menuPage = queryMenuDao.findMenuPage(page, record, search, orderBy, null, null);
+        // 从 JWT 获取 app_id，用于与 t_app_res_relation 表关联
+        String appId = JWTKit.getAppid();
+        List<MenuRecord> menuPage = queryMenuDao.findMenuPage(page, record, search, orderBy, null, null, appId);
 
         page.setRecords(menuPage);
 
-        return SuccessTip.create(page);
-    }
-
-    //设置权限
-    public void setPerm(Menu entity ){
-        logger.info("-----permId :{}----",entity.getPermId());
-        if(entity.getPermId()!=null){
-            String perm = queryMenuDao.getPerm(entity.getPermId());
-            entity.setPerm(perm);
-        }else{
-            entity.setPerm(null);
-        }
+        return ApiResult.success(page);
     }
 
 }

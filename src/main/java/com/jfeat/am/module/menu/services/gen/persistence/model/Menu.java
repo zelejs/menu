@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ * 菜单实体
  * </p>
  *
  * @author Code generator
@@ -18,120 +18,113 @@ import java.io.Serializable;
 @TableName("t_sys_menu")
 public class Menu extends Model<Menu> {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-      /**
+    /**
      * 菜单ID
      */
-      @TableId(value = "id", type = IdType.AUTO)
-      private Long id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
-      /**
-     * 菜单名
+    /**
+     * 父菜单ID
      */
-      private String menuName;
+    private Long pid;
 
-      /**
-     * 父类id
+    /**
+     * 路由标题
      */
-      private Long pid;
+    private String name;
 
-      /**
-     * 鏄剧ず椤哄簭
+    /**
+     * 路由地址
      */
-      private Integer orderNum;
+    private String path;
 
-      /**
-     * 璺敱鍦板潃
+    /**
+     * 组件路径
      */
-      private String path;
+    private String component;
 
-      /**
-     * 缁勪欢璺緞
+    /**
+     * 路由跳转
      */
-      private String component;
+    private String redirect;
 
-      /**
-     * 鏄惁涓哄閾撅紙0鏄� 1鍚︼級
+    /**
+     * 路由包装组件
      */
-      private Integer isFrame;
+    private String wrappers;
 
-      /**
-     * 鏄惁缂撳瓨锛�0缂撳瓨 1涓嶇紦瀛橈級
+    /**
+     * 菜单图标
      */
-      private Integer isCache;
+    private String icon;
 
-      /**
-     * 鑿滃崟绫诲瀷锛圡鐩綍 C鑿滃崟 F鎸夐挳锛�
+    /**
+     * 创建时间
      */
-      private String menuType;
+    private Date createTime;
 
-      /**
-     * 鑿滃崟鐘舵�侊紙0鏄剧ず 1闅愯棌锛�
+    /**
+     * 更新时间
      */
-      private String visible;
+    private Date updateTime;
 
-      /**
-     * 鑿滃崟鐘舵�侊紙0姝ｅ父 1鍋滅敤锛�
+    /**
+     * 菜单配置文件
      */
-      private String status;
+    private String menuConfig;
 
-      /**
-     * 鏉冮檺id
+    /**
+     * 隐藏菜单
      */
-      private Long permId;
+    private Integer hideInMenu;
 
-      //权限
-      private String perm;
-
-      /**
-     * 鑿滃崟鍥炬爣
+    /**
+     * 权限ID
      */
-      private String icon;
+    private Long permId;
 
-      /**
-     * 鍒涘缓鑰�
+    /**
+     * 显示顺序
      */
-      private String createBy;
+    private Integer orderNum;
 
-      /**
-     * 鍒涘缓鏃堕棿
+    /**
+     * 菜单类型（C=目录 M=菜单 F=按钮）
      */
-      private Date createTime;
+    private String menuType;
 
-      /**
-     * 鏇存柊鑰�
+    /**
+     * 是否外链（0否 1是）
      */
-      private String updateBy;
+    private Integer isFrame;
 
-      /**
-     * 鏇存柊鏃堕棿
+    /**
+     * 是否缓存（0缓存 1不缓存）
      */
-      private Date updateTime;
+    private Integer isCache;
 
-      /**
-     * 澶囨敞
+    /**
+     * 显示状态（0显示 1隐藏）
      */
-      private String remark;
+    private String visible;
 
-      /**
-     * 闅旂鏍囪瘑
+    /**
+     * 菜单状态（0正常 1停用）
      */
-      private Long orgId;
+    private String status;
 
     /*
-     * 2023-08-28 增加新需求：要求菜单模块返回entityName和pageId
+     * 2023-08-28 增加新需求：要求菜单模块返回pageId
      */
-    private String entityName;
     private Long pageId;
 
-    public String getEntityName() {
-        return entityName;
-    }
-
-    public void setEntityName(String entityName) {
-        this.entityName = entityName;
-    }
+    /**
+     * 删除标记（0未删除 1已删除）
+     */
+    private Integer deleteFlag;
 
     public Long getPageId() {
         return pageId;
@@ -141,253 +134,235 @@ public class Menu extends Model<Menu> {
         this.pageId = pageId;
     }
 
-    public String getPerm() {
-        return perm;
+    public Integer getDeleteFlag() {
+        return deleteFlag;
     }
 
-    public void setPerm(String perm) {
-        this.perm = perm;
+    public void setDeleteFlag(Integer deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 
     public Long getId() {
         return id;
     }
 
-      public Menu setId(Long id) {
-          this.id = id;
-          return this;
-      }
-    
-    public String getMenuName() {
-        return menuName;
+    public Menu setId(Long id) {
+        this.id = id;
+        return this;
     }
-
-      public Menu setMenuName(String menuName) {
-          this.menuName = menuName;
-          return this;
-      }
-
-
-
-    public Integer getOrderNum() {
-        return orderNum;
-    }
-
-      public Menu setOrderNum(Integer orderNum) {
-          this.orderNum = orderNum;
-          return this;
-      }
-    
-    public String getPath() {
-        return path;
-    }
-
-      public Menu setPath(String path) {
-          this.path = path;
-          return this;
-      }
-    
-    public String getComponent() {
-        return component;
-    }
-
-      public Menu setComponent(String component) {
-          this.component = component;
-          return this;
-      }
-    
-    public Integer getIsFrame() {
-        return isFrame;
-    }
-
-      public Menu setIsFrame(Integer isFrame) {
-          this.isFrame = isFrame;
-          return this;
-      }
-    
-    public Integer getIsCache() {
-        return isCache;
-    }
-
-      public Menu setIsCache(Integer isCache) {
-          this.isCache = isCache;
-          return this;
-      }
-    
-    public String getMenuType() {
-        return menuType;
-    }
-
-      public Menu setMenuType(String menuType) {
-          this.menuType = menuType;
-          return this;
-      }
-    
-    public String getVisible() {
-        return visible;
-    }
-
-      public Menu setVisible(String visible) {
-          this.visible = visible;
-          return this;
-      }
-    
-    public String getStatus() {
-        return status;
-    }
-
-      public Menu setStatus(String status) {
-          this.status = status;
-          return this;
-      }
-    
-    public Long getPermId() {
-        return permId;
-    }
-
-      public Menu setPermId(Long permId) {
-          this.permId = permId;
-          return this;
-      }
-    
-    public String getIcon() {
-        return icon;
-    }
-
-      public Menu setIcon(String icon) {
-          this.icon = icon;
-          return this;
-      }
-    
-    public String getCreateBy() {
-        return createBy;
-    }
-
-      public Menu setCreateBy(String createBy) {
-          this.createBy = createBy;
-          return this;
-      }
-    
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-      public Menu setCreateTime(Date createTime) {
-          this.createTime = createTime;
-          return this;
-      }
-    
-    public String getUpdateBy() {
-        return updateBy;
-    }
-
-      public Menu setUpdateBy(String updateBy) {
-          this.updateBy = updateBy;
-          return this;
-      }
-    
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-      public Menu setUpdateTime(Date updateTime) {
-          this.updateTime = updateTime;
-          return this;
-      }
-    
-    public String getRemark() {
-        return remark;
-    }
-
-      public Menu setRemark(String remark) {
-          this.remark = remark;
-          return this;
-      }
-    
-    public Long getOrgId() {
-        return orgId;
-    }
-
-      public Menu setOrgId(Long orgId) {
-          this.orgId = orgId;
-          return this;
-      }
 
     public Long getPid() {
         return pid;
     }
 
-    public void setPid(Long pid) {
+    public Menu setPid(Long pid) {
         this.pid = pid;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Menu setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public Menu setPath(String path) {
+        this.path = path;
+        return this;
+    }
+
+    public String getComponent() {
+        return component;
+    }
+
+    public Menu setComponent(String component) {
+        this.component = component;
+        return this;
+    }
+
+    public String getRedirect() {
+        return redirect;
+    }
+
+    public Menu setRedirect(String redirect) {
+        this.redirect = redirect;
+        return this;
+    }
+
+    public String getWrappers() {
+        return wrappers;
+    }
+
+    public Menu setWrappers(String wrappers) {
+        this.wrappers = wrappers;
+        return this;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public Menu setIcon(String icon) {
+        this.icon = icon;
+        return this;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public Menu setCreateTime(Date createTime) {
+        this.createTime = createTime;
+        return this;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public Menu setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+        return this;
+    }
+
+    public String getMenuConfig() {
+        return menuConfig;
+    }
+
+    public Menu setMenuConfig(String menuConfig) {
+        this.menuConfig = menuConfig;
+        return this;
+    }
+
+    public Integer getHideInMenu() {
+        return hideInMenu;
+    }
+
+    public Menu setHideInMenu(Integer hideInMenu) {
+        this.hideInMenu = hideInMenu;
+        return this;
+    }
+
+    public Long getPermId() {
+        return permId;
+    }
+
+    public Menu setPermId(Long permId) {
+        this.permId = permId;
+        return this;
+    }
+
+    public Integer getOrderNum() {
+        return orderNum;
+    }
+
+    public Menu setOrderNum(Integer orderNum) {
+        this.orderNum = orderNum;
+        return this;
+    }
+
+    public String getMenuType() {
+        return menuType;
+    }
+
+    public Menu setMenuType(String menuType) {
+        this.menuType = menuType;
+        return this;
+    }
+
+    public Integer getIsFrame() {
+        return isFrame;
+    }
+
+    public Menu setIsFrame(Integer isFrame) {
+        this.isFrame = isFrame;
+        return this;
+    }
+
+    public Integer getIsCache() {
+        return isCache;
+    }
+
+    public Menu setIsCache(Integer isCache) {
+        this.isCache = isCache;
+        return this;
+    }
+
+    public String getVisible() {
+        return visible;
+    }
+
+    public Menu setVisible(String visible) {
+        this.visible = visible;
+        return this;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Menu setStatus(String status) {
+        this.status = status;
+        return this;
     }
 
     public static final String ID = "id";
+    public static final String PID = "pid";
+    public static final String NAME = "name";
+    public static final String PATH = "path";
+    public static final String COMPONENT = "component";
+    public static final String REDIRECT = "redirect";
+    public static final String WRAPPERS = "wrappers";
+    public static final String ICON = "icon";
+    public static final String CREATE_TIME = "create_time";
+    public static final String UPDATE_TIME = "update_time";
+    public static final String MENU_CONFIG = "menu_config";
+    public static final String HIDE_IN_MENU = "hide_in_menu";
+    public static final String PERM_ID = "perm_id";
+    public static final String ORDER_NUM = "order_num";
+    public static final String MENU_TYPE = "menu_type";
+    public static final String IS_FRAME = "is_frame";
+    public static final String IS_CACHE = "is_cache";
+    public static final String VISIBLE = "visible";
+    public static final String STATUS = "status";
+    public static final String DELETE_FLAG = "delete_flag";
 
-      public static final String MENU_NAME = "menu_name";
-
-      public static final String PARENT_ID = "parent_id";
-
-      public static final String ORDER_NUM = "order_num";
-
-      public static final String PATH = "path";
-
-      public static final String COMPONENT = "component";
-
-      public static final String IS_FRAME = "is_frame";
-
-      public static final String IS_CACHE = "is_cache";
-
-      public static final String MENU_TYPE = "menu_type";
-
-      public static final String VISIBLE = "visible";
-
-      public static final String STATUS = "status";
-
-      public static final String PERM_ID = "perm_id";
-
-      public static final String ICON = "icon";
-
-      public static final String CREATE_BY = "create_by";
-
-      public static final String CREATE_TIME = "create_time";
-
-      public static final String UPDATE_BY = "update_by";
-
-      public static final String UPDATE_TIME = "update_time";
-
-      public static final String REMARK = "remark";
-
-      public static final String ORG_ID = "org_id";
-
-      @Override
+    @Override
     public Serializable pkVal() {
-          return this.id;
-      }
-
-
-
+        return this.id;
+    }
 
     @Override
     public String toString() {
         return "Menu{" +
-              "id=" + id +
-                  ", menuName=" + menuName +
-                  ", orderNum=" + orderNum +
-                  ", path=" + path +
-                  ", component=" + component +
-                  ", isFrame=" + isFrame +
-                  ", isCache=" + isCache +
-                  ", menuType=" + menuType +
-                  ", visible=" + visible +
-                  ", status=" + status +
-                  ", permId=" + permId +
-                  ", icon=" + icon +
-                  ", createBy=" + createBy +
-                  ", createTime=" + createTime +
-                  ", updateBy=" + updateBy +
-                  ", updateTime=" + updateTime +
-                  ", remark=" + remark +
-                  ", orgId=" + orgId +
-              "}";
+                "id=" + id +
+                ", pid=" + pid +
+                ", name=" + name +
+                ", path=" + path +
+                ", component=" + component +
+                ", redirect=" + redirect +
+                ", wrappers=" + wrappers +
+                ", icon=" + icon +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", menuConfig=" + menuConfig +
+                ", hideInMenu=" + hideInMenu +
+                ", permId=" + permId +
+                ", orderNum=" + orderNum +
+                ", menuType=" + menuType +
+                ", isFrame=" + isFrame +
+                ", isCache=" + isCache +
+                ", visible=" + visible +
+                ", status=" + status +
+                ", pageId=" + pageId +
+                ", deleteFlag=" + deleteFlag +
+                '}';
     }
 }

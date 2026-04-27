@@ -1,0 +1,165 @@
+### ============================================================================
+### Menu Order/Sort Update API Tests
+### Base URL: http://129.204.59.156:30081
+### API Prefix: /api/adm/menu/menus
+###
+### ✅ TEST RESULTS (2026-04-22):
+### - API is reachable and returns HTTP 200
+### - PUT /api/adm/menu/menus/{id} with orderNum update: ✅ SUCCESS
+### - Tested menu ID 176:
+###   * Updated orderNum from 0 → 10: SUCCESS (affected: 1 row)
+###   * Updated orderNum from 10 → 25: SUCCESS (affected: 1 row)
+###   * Restored orderNum from 25 → 0: SUCCESS (affected: 1 row)
+### - GET /api/adm/menu/menus/{id}: ✅ Returns correct orderNum
+### - GET /api/adm/menu/menus with orderBy & sort: ✅ SUCCESS
+### - updateTime is automatically updated on orderNum change
+### ============================================================================
+@baseUrl = http://129.204.59.156:30081
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@menuId = 1
+
+### ============================================================================
+### Setup: Get all menus to find valid menu IDs
+### ============================================================================
+
+###
+### Get all menus (paginated list)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=order_num&sort=ASC
+
+###
+### Get all menus with JWT token
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=order_num&sort=ASC
+Authorization: Bearer {{jwtToken}}
+
+### ============================================================================
+### Test 1: Update Menu Order Number (orderNum)
+### ============================================================================
+
+###
+### TC-01-01: Update menu orderNum to 10
+PUT {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+Content-Type: application/json
+
+{
+  "orderNum": 10
+}
+
+###
+### TC-01-02: Verify the orderNum was updated
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+###
+### TC-01-03: Update menu orderNum to 5
+PUT {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+Content-Type: application/json
+
+{
+  "orderNum": 5
+}
+
+###
+### TC-01-04: Query menus sorted by orderNum (ascending)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=order_num&sort=ASC
+
+###
+### TC-01-05: Query menus sorted by orderNum (descending)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=order_num&sort=DESC
+
+### ============================================================================
+### Test 2: Update Menu with Multiple Fields Including orderNum
+### ============================================================================
+
+###
+### TC-02-01: Update menu with name and orderNum
+PUT {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+Content-Type: application/json
+
+{
+  "name": "Test Menu Updated",
+  "orderNum": 15
+}
+
+###
+### TC-02-02: Verify the update
+GET {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+
+### ============================================================================
+### Test 3: Query Menus with Different OrderBy Values
+### ============================================================================
+
+###
+### TC-03-01: Query menus ordered by name (ASC)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=name&sort=ASC
+
+###
+### TC-03-02: Query menus ordered by name (DESC)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=name&sort=DESC
+
+###
+### TC-03-03: Query menus ordered by createTime (DESC - newest first)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=create_time&sort=DESC
+
+###
+### TC-03-04: Query menus ordered by updateTime (DESC - recently updated first)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=update_time&sort=DESC
+
+### ============================================================================
+### Test 4: Filter Menus by orderNum
+### ============================================================================
+
+###
+### TC-04-01: Filter menus with specific orderNum
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderNum=10
+
+###
+### TC-04-02: Filter menus with orderNum=5
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderNum=5
+
+### ============================================================================
+### Test 5: Invalid Sort Value
+### ============================================================================
+
+###
+### TC-05-01: Try invalid sort value (should return 400 error)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=order_num&sort=INVALID
+
+### ============================================================================
+### Test 6: Default Sort Behavior (no sort parameter)
+### ============================================================================
+
+###
+### TC-06-01: Query with orderBy but no sort (should default to ASC)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&orderBy=order_num
+
+###
+### TC-06-02: Query with no orderBy or sort (should use default order_num ASC)
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20
+
+### ============================================================================
+### Test 7: Combined Filters with Sorting
+### ============================================================================
+
+###
+### TC-07-01: Query menus filtered by menuType=C, sorted by orderNum
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&menuType=C&orderBy=order_num&sort=ASC
+
+###
+### TC-07-02: Query menus filtered by status=0, sorted by orderNum
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&status=0&orderBy=order_num&sort=ASC
+
+###
+### TC-07-03: Search menus with keyword "menu", sorted by orderNum
+GET {{baseUrl}}/api/adm/menu/menus?pageNum=1&pageSize=20&search=menu&orderBy=order_num&sort=ASC
+
+### ============================================================================
+### Cleanup: Restore Original Order
+### ============================================================================
+
+###
+### Restore orderNum to 0 (default)
+PUT {{baseUrl}}/api/adm/menu/menus/{{menuId}}
+Content-Type: application/json
+
+{
+  "orderNum": 0
+}

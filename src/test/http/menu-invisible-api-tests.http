@@ -1,0 +1,409 @@
+### ============================================================================
+### Menu Invisible Feature API Tests
+### Base URL: http://localhost:8080
+### API Prefix: /api/adm/menu/app
+### ============================================================================
+@baseUrl = http://localhost:8080
+#@baseUrl = http://129.204.59.156:30081
+@apiPrefix = /api/adm/menu/app
+@jwtToken = YOUR_JWT_TOKEN
+@menuId = 1
+
+### ============================================================================
+### Setup: Get all menus and extract IDs dynamically
+### ============================================================================
+
+###
+### TC-Setup-01: Get all menu groups (existing endpoint - excludes invisible)
+
+GET {{baseUrl}}{{apiPrefix}}/group
+Authorization: Bearer {{jwtToken}}
+
+###
+### TC-Setup-02: Get all menus including invisible and extract IDs
+
+GET {{baseUrl}}{{apiPrefix}}/menus
+Authorization: Bearer {{jwtToken}}
+
+# @extract data.0.id -> parentMenuId
+# @extract data.1.id -> childMenuId
+
+### ============================================================================
+### TC-01: Get All Menus Without Search
+### ============================================================================
+
+###
+### TC-01-01: Get all menus including invisible - without search parameter
+
+GET {{baseUrl}}{{apiPrefix}}/menus
+Authorization: Bearer {{jwtToken}}
+
+### ============================================================================
+### TC-02: Get All Menus With Search
+### ============================================================================
+
+###
+### TC-02-01: Get all menus with search parameter
+
+GET {{baseUrl}}{{apiPrefix}}/menus?search=menu
+Authorization: Bearer {{jwtToken}}
+
+###
+### TC-02-02: Get all menus with empty search
+
+GET {{baseUrl}}{{apiPrefix}}/menus?search=
+Authorization: Bearer {{jwtToken}}
+
+### ============================================================================
+### TC-03: Set Menu to Invisible (Default Behavior)
+### ============================================================================
+
+###
+### TC-03-01: Set {{parentMenuId}} to invisible (no request body - defaults to value=1)
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+###
+### TC-03-02: Verify menu is now invisible
+
+GET {{baseUrl}}{{apiPrefix}}/menus
+Authorization: Bearer {{jwtToken}}
+
+###
+### TC-03-03: Verify menu is filtered from regular group endpoint
+
+GET {{baseUrl}}{{apiPrefix}}/group
+Authorization: Bearer {{jwtToken}}
+
+### ============================================================================
+### TC-04: Set Menu to Invisible (Explicit Value)
+### ============================================================================
+
+###
+### TC-04-01: Set {{childMenuId}} to invisible with explicit value=1
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{childMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 1
+}
+
+###
+### TC-04-02: Verify child menu is now invisible
+
+GET {{baseUrl}}{{apiPrefix}}/menus
+Authorization: Bearer {{jwtToken}}
+
+### ============================================================================
+### TC-05: Set Menu to Visible
+### ============================================================================
+
+###
+### TC-05-01: Set {{parentMenuId}} back to visible (value=0)
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+###
+### TC-05-02: Verify menu is visible again
+
+GET {{baseUrl}}{{apiPrefix}}/group
+Authorization: Bearer {{jwtToken}}
+
+### ============================================================================
+### TC-06: Toggle Menu Visibility Multiple Times
+### ============================================================================
+
+###
+### TC-06-01: Toggle {{childMenuId}} to invisible
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{childMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 1
+}
+
+###
+### TC-06-02: Toggle {{childMenuId}} back to visible
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{childMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+###
+### TC-06-03: Toggle {{childMenuId}} to invisible again (default behavior)
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{childMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+###
+### TC-06-04: Final toggle - back to visible
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{childMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+### ============================================================================
+### TC-07: Invalid Menu ID
+### ============================================================================
+
+###
+### TC-07-01: Attempt to set invisible on non-existent menu ID
+
+POST {{baseUrl}}{{apiPrefix}}/menus/999999/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 1
+}
+
+### ============================================================================
+### TC-08: Invalid Invisible Value (Out of Range)
+### ============================================================================
+
+###
+### TC-08-01: Try to set invisible to value=2 (invalid)
+# @expected 400
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 2
+}
+
+###
+### TC-08-02: Try to set invisible to value=-1 (invalid)
+# @expected 400
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": -1
+}
+
+###
+### TC-08-03: Try to set invisible to value=10 (invalid)
+# @expected 400
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 10
+}
+
+### ============================================================================
+### TC-09: Invalid Request Body Format
+### ============================================================================
+
+###
+### TC-09-01: Send string value instead of integer
+# @expected 400
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": "invalid"
+}
+
+### ============================================================================
+### TC-10: Missing Authorization
+### ============================================================================
+
+###
+### TC-10-01: Request without JWT token
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+###
+### TC-10-02: Request with invalid token
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer invalid_token_12345
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+### ============================================================================
+### TC-11: Parent Menu Invisible - Children Affected
+### ============================================================================
+
+###
+### TC-11-01: Get fresh menu data and extract test IDs
+
+GET {{baseUrl}}{{apiPrefix}}/menus
+Authorization: Bearer {{jwtToken}}
+
+# @extract data.0.id -> testParentId
+# @extract data.1.id -> testChildId
+
+###
+### TC-11-02: Set parent menu to invisible
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{testParentId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 1
+}
+
+###
+### TC-11-03: Verify parent and children are filtered from regular group endpoint
+
+GET {{baseUrl}}{{apiPrefix}}/group
+Authorization: Bearer {{jwtToken}}
+
+###
+### TC-11-04: Verify parent and children still appear in all menus endpoint
+
+GET {{baseUrl}}{{apiPrefix}}/menus
+Authorization: Bearer {{jwtToken}}
+
+###
+### TC-11-05: Restore parent menu visibility
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{testParentId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+### ============================================================================
+### TC-12: Child Menu Independent Visibility
+### ============================================================================
+
+###
+### TC-12-01: Set second menu to invisible (different from parent)
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{testChildId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 1
+}
+
+###
+### TC-12-02: Verify first menu is still visible in group endpoint
+
+GET {{baseUrl}}{{apiPrefix}}/group
+Authorization: Bearer {{jwtToken}}
+
+###
+### TC-12-03: Restore second menu visibility
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{testChildId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+### ============================================================================
+### Comparison Tests: Group vs All Menus Endpoints
+### ============================================================================
+
+###
+### TC-Compare-01: Regular group endpoint (excludes invisible menus)
+
+GET {{baseUrl}}{{apiPrefix}}/group
+Authorization: Bearer {{jwtToken}}
+
+###
+### TC-Compare-02: All menus endpoint (includes invisible menus)
+
+GET {{baseUrl}}{{apiPrefix}}/menus
+Authorization: Bearer {{jwtToken}}
+
+### ============================================================================
+### Cleanup: Restore All Menus to Visible State
+### ============================================================================
+
+###
+### TC-Cleanup-01: Restore parent menu
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{parentMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+###
+### TC-Cleanup-02: Restore child menu
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{childMenuId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+###
+### TC-Cleanup-03: Restore test parent menu
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{testParentId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+###
+### TC-Cleanup-04: Restore test child menu
+
+POST {{baseUrl}}{{apiPrefix}}/menus/{{testChildId}}/op/invisible
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "value": 0
+}
+
+###
+### TC-Cleanup-05: Final verification - all menus should be visible
+
+GET {{baseUrl}}{{apiPrefix}}/group
+Authorization: Bearer {{jwtToken}}
