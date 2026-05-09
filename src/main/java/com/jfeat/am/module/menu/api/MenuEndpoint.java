@@ -163,6 +163,7 @@ public class MenuEndpoint {
             @ApiImplicitParam(name = "status", dataType = "String"),
             @ApiImplicitParam(name = "permId", dataType = "Long"),
             @ApiImplicitParam(name = "icon", dataType = "String"),
+            @ApiImplicitParam(name = "deleteFlag", dataType = "Integer"),
             @ApiImplicitParam(name = "createTime", dataType = "Date"),
             @ApiImplicitParam(name = "updateTime", dataType = "Date"),
             @ApiImplicitParam(name = "orderBy", dataType = "String"),
@@ -187,6 +188,7 @@ public class MenuEndpoint {
                           @RequestParam(name = "status", required = false) String status,
                           @RequestParam(name = "permId", required = false) Long permId,
                           @RequestParam(name = "icon", required = false) String icon,
+                          @RequestParam(name = "deleteFlag", required = false) Integer deleteFlag,
                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                           @RequestParam(name = "createTime", required = false) Date createTime,
                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -224,6 +226,7 @@ public class MenuEndpoint {
         record.setStatus(status);
         record.setPermId(permId);
         record.setIcon(icon);
+        record.setDeleteFlag(deleteFlag);
         record.setCreateTime(createTime);
         record.setUpdateTime(updateTime);
 

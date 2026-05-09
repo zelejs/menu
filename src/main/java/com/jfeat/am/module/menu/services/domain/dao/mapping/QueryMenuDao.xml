@@ -51,6 +51,7 @@
                 t_sys_menu.perm_id AS permId,
                 t_sys_menu.menu_type AS menuType, t_sys_menu.is_frame AS isFrame,
                 t_sys_menu.is_cache AS isCache, t_sys_menu.visible, t_sys_menu.status,
+                t_sys_menu.delete_flag AS deleteFlag,
                 t_app_res_relation.app_id AS appId,
                 t_app_res_relation.pid AS pid,
                 t_app_res_relation.order_num AS orderNum
@@ -70,6 +71,7 @@
                 t_sys_menu.perm_id AS permId, t_sys_menu.order_num AS orderNum,
                 t_sys_menu.menu_type AS menuType, t_sys_menu.is_frame AS isFrame,
                 t_sys_menu.is_cache AS isCache, t_sys_menu.visible, t_sys_menu.status,
+                t_sys_menu.delete_flag AS deleteFlag,
                 NULL AS appId
                 FROM t_sys_menu
                 WHERE 1=1
@@ -126,6 +128,10 @@
 
         <if test="record.icon != null and record.icon!= ''">
             AND t_sys_menu.icon LIKE CONCAT('%',#{record.icon},'%')
+        </if>
+
+        <if test="record.deleteFlag != null">
+            AND t_sys_menu.delete_flag = #{record.deleteFlag}
         </if>
 
         <if test="startTime != null">

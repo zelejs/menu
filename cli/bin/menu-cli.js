@@ -64,7 +64,8 @@ function printTable(records) {
     const type = (item.menuType || item.menu_type || 'N/A').padEnd(4);
     const name = (item.name || 'N/A').padEnd(20);
     const pathStr = (item.path || '-').padEnd(20);
-    console.log(`[${String(item.id).padStart(4)}] ${name} type:${type} status:${statusStr} path:${pathStr}`);
+    const deletedTag = item.deleteFlag === 1 ? ' [DELETED]' : '';
+    console.log(`[${String(item.id).padStart(4)}] ${name} type:${type} status:${statusStr} path:${pathStr}${deletedTag}`);
   });
 }
 
@@ -108,6 +109,7 @@ menuCmd
   .option('--name <name>', 'filter by name')
   .option('--path <path>', 'filter by path')
   .option('--status <status>', 'filter by status')
+  .option('--deleted', 'show only deleted menus (delete_flag=1)')
   .action(async (options) => {
     const params = {
       pageNum: options.page,
@@ -117,6 +119,7 @@ menuCmd
     if (options.name) params.name = options.name;
     if (options.path) params.path = options.path;
     if (options.status) params.status = options.status;
+    if (options.deleted) params.deleteFlag = 1;
 
     const result = await api.get('/menus', { params });
     if (program.opts().json) {
@@ -125,6 +128,31 @@ menuCmd
       const data = result.data || {};
       const records = data.records || [];
       console.log(`Page ${data.current || 1} of ${data.pages || 1}, Total: ${data.total || records.length}`);
+      printTable(records);
+    }
+  });
+
+menuCmd
+  .command('trash')
+  .description('List deleted menus (delete_flag=1)')
+  .option('-p, --page <num>', 'page number', '1')
+  .option('-s, --page-size <size>', 'page size', '10')
+  .option('--search <keyword>', 'search keyword')
+  .action(async (options) => {
+    const params = {
+      pageNum: options.page,
+      pageSize: options.pageSize,
+      deleteFlag: 1
+    };
+    if (options.search) params.search = options.search;
+
+    const result = await api.get('/menus', { params });
+    if (program.opts().json) {
+      printJson(result);
+    } else {
+      const data = result.data || {};
+      const records = data.records || [];
+      console.log(`Trash - Page ${data.current || 1} of ${data.pages || 1}, Total: ${data.total || records.length}`);
       printTable(records);
     }
   });
@@ -305,6 +333,19 @@ appCmd
       printJson(result);
     } else {
       console.log(`Set menu [${id}] invisible=${value}: affected ${result.data} row(s)`);
+    }
+  });
+
+appCmd
+  .command('delete <id>')
+  .alias('remove')
+  .description('Delete a menu by ID (removes app relation when app token is used)')
+  .action(async (id) => {
+    const result = await api.delete(`/menus/${id}`);
+    if (program.opts().json) {
+      printJson(result);
+    } else {
+      console.log(`Deleted menu [${id}]: affected ${result.data} row(s)`);
     }
   });
 
