@@ -37,7 +37,7 @@
     <update id="updatePid">
         UPDATE t_app_res_relation
         SET pid = #{pid},
-            update_time = NOW()
+            updated_at = NOW()
         WHERE app_id = #{appid}
         AND res_id = #{resId}
         AND res_type = 'menu'
@@ -57,7 +57,7 @@
     <update id="batchUpdatePid">
         UPDATE t_app_res_relation
         SET pid = #{pid},
-            update_time = NOW()
+            updated_at = NOW()
         WHERE app_id = #{appid}
         AND res_id IN <foreach collection="resIds" item="resId" open="(" separator="," close=")">#{resId}</foreach>
         AND res_type = 'menu'
