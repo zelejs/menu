@@ -11,7 +11,7 @@ A new menu entry has been created in `t_sys_menu`:
 | **Menu Type** | `M` (Menu) |
 | **Parent ID** | `58` (设备 / Device) |
 | **Path** | `/device-mgmt/crash-log` |
-| **Component** | *(empty — pending mdm-admin)* |
+| **Component** | `./device-mgmt/crash-log` |
 | **Icon** | `FileTextOutlined` |
 | **Status** | `0` (enabled) |
 | **Visible** | `0` (show) |
@@ -43,13 +43,13 @@ Current convention in this project:
 
 **Suggested component path** (based on existing naming):
 ```
-./device-mgmt/crashLog
+./device-mgmt/crash-log
 ```
 
 Please confirm or provide the actual component path. Once confirmed, the `component` field will be updated via:
 
 ```bash
-menu-cli menu update 224 --component "./device-mgmt/crashLog"
+menu-cli menu update 224 --component "./device-mgmt/crash-log"
 ```
 
 ### 3.2 Route Configuration
@@ -103,13 +103,13 @@ Once mdm-admin provides the component path, run:
 
 ```bash
 # Update component
-menu-cli menu update 224 --component "./device-mgmt/crashLog"
+menu-cli menu update 224 --component "./device-mgmt/crash-log"
 
 # If route path needs to change
 menu-cli menu update 224 --path "/device-mgmt/crash-log"
 
 # If wrappers are needed
-menu-cli menu update 224 --component "./device-mgmt/crashLog" --wrappers "BasicLayout"
+menu-cli menu update 224 --component "./device-mgmt/crash-log" --wrappers "BasicLayout"
 
 # Verify
 menu-cli menu get 224

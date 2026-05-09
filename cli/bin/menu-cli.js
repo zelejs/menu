@@ -4,9 +4,9 @@ const { Command } = require('commander');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 if (!process.env.MENU_BASE_URL) {
-  require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+  require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
 }
 
 const packageJson = require('../package.json');
@@ -350,6 +350,30 @@ appCmd
       printJson(result);
     } else {
       console.log(`Moved app menu [${id}] to parent [${options.parent}]: affected ${result.data} row(s)`);
+    }
+  });
+
+appCmd
+  .command('moveup <id>')
+  .description('Move menu up in order (decrease orderNum by 1)')
+  .action(async (id) => {
+    const result = await api.post(`/app/menus/${id}/op/moveup`);
+    if (program.opts().json) {
+      printJson(result);
+    } else {
+      console.log(`Moved up menu [${id}]: new orderNum=${result.data}`);
+    }
+  });
+
+appCmd
+  .command('movedown <id>')
+  .description('Move menu down in order (increase orderNum by 1)')
+  .action(async (id) => {
+    const result = await api.post(`/app/menus/${id}/op/movedown`);
+    if (program.opts().json) {
+      printJson(result);
+    } else {
+      console.log(`Moved down menu [${id}]: new orderNum=${result.data}`);
     }
   });
 
