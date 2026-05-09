@@ -50,4 +50,13 @@ public interface MenuAppService extends CRUDMenuService {
      * @return 新的排序号
      */
     Integer moveDown(Long menuId);
+
+    /**
+     * 移动菜单到指定父菜单（应用级别，更新 t_app_res_relation.pid）
+     *
+     * @param menuId 菜单ID
+     * @param pid 目标父菜单ID（null 表示移到顶层）
+     * @return 更新的记录数
+     */
+    Integer moveMenu(Long menuId, Long pid);
 }

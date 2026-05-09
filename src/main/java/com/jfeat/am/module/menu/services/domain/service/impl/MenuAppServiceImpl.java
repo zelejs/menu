@@ -281,4 +281,20 @@ public class MenuAppServiceImpl extends CRUDMenuServiceImpl implements MenuAppSe
         return newOrderNum;
     }
 
+    @Override
+    public Integer moveMenu(Long menuId, Long pid) {
+        String appId = JWTKit.getAppid();
+        if (appId == null || appId.isEmpty()) {
+            throw new BusinessException(400, "AppId is required");
+        }
+
+        // 检查菜单是否存在
+        Integer count = appResRelationMapper.countByAppIdAndResId(appId, menuId);
+        if (count == null || count == 0) {
+            throw new BusinessException(404, "Menu not found in app");
+        }
+
+        return appResRelationMapper.updatePid(appId, menuId, pid);
+    }
+
 }

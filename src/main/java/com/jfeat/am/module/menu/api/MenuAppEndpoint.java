@@ -123,7 +123,16 @@ public class MenuAppEndpoint {
         return ApiResult.success(newOrderNum);
     }
 
-
-
+    /**
+     * 移动菜单到指定父菜单（应用级别）
+     */
+    @ApiOperation(value = "移动菜单到指定父菜单", notes = "更新应用资源关系表中的父子关系，pid=null表示移到顶层")
+    @PostMapping("/menus/{id}/op/move")
+    public ApiResult<Integer> moveMenu(
+        @ApiParam(value = "菜单ID", required = true) @PathVariable Long id,
+        @ApiParam(value = "目标父菜单ID（不传或null表示移到顶层）") @RequestParam(required = false) Long pid) {
+        Integer affected = menuAppService.moveMenu(id, pid);
+        return ApiResult.success(affected);
+    }
 
 }

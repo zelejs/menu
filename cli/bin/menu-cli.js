@@ -337,6 +337,23 @@ appCmd
   });
 
 appCmd
+  .command('move <id>')
+  .description('Move a menu to a new parent (app-level, updates t_app_res_relation.pid)')
+  .requiredOption('-p, --parent <pid>', 'new parent menu ID (null for top level)')
+  .action(async (id, options) => {
+    const params = {};
+    if (options.parent !== 'null' && options.parent !== 'NULL') {
+      params.pid = parseInt(options.parent);
+    }
+    const result = await api.post(`/app/menus/${id}/op/move`, null, { params });
+    if (program.opts().json) {
+      printJson(result);
+    } else {
+      console.log(`Moved app menu [${id}] to parent [${options.parent}]: affected ${result.data} row(s)`);
+    }
+  });
+
+appCmd
   .command('delete <id>')
   .alias('remove')
   .description('Delete a menu by ID (removes app relation when app token is used)')
